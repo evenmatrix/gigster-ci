@@ -37,8 +37,8 @@ test:
 deployment:
   # Customize your deployment commands (if necessary)
   # Below values can be left as is for Gigster HQ projects
-  prod:
-    branch: master
-    owner: liquidlabs-co
-    commands:
-      - ./deploy.sh
+  #prod:
+  #  branch: master
+  #  owner: liquidlabs-co
+  #  commands:
+  #    - ./deploy.sh
