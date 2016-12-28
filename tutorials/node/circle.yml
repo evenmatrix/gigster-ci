@@ -1,44 +1,82 @@
+#---STAGE 1: CUSTOMIZE THE TEST MACHINE---#
+#
+# Setting up you test environment has two key parts: 
+# (1) determining which circleci services to use
+# (2) setting environment variables
+#
 machine:
   services:
     - docker
   environment:
   # set your environment variables here
   #
-  # Example:
+  # examples:
   #
   # environment:
   #   DB_URL_MONGO: mongodb://127.0.0.1:2017/test
+  
+    YOUR_GITHUB_USERNAME: # TODO: set your github username
+#---STAGE 2: INSTALL DEPENDENCIES---#
+#
+# Circle automatically detects the dependencies for many types of frameworks
+# e.g., Ruby's Gemfile, Python's requirements.txt, and Node.js's package.json
+#
+# When a framework is detected, circleci will automatically run the appropriate
+# command. For example, if nodjes is detected, circleci will automatically run
+# "npm install", i.e., no need to run it 
+#
+# You can add pre, post, and override sections in the dependencies block to run
+# your custom dependency commands
+
 dependencies:
-  # Circle automatically detects the dependencies for many types of frameworks
-  # e.g., Ruby's Gemfile, Python's requirements.txt, and Node.js's package.json
-  # You can add pre, post, and override sections in the dependencies block to run
-  # your custom dependency commands
-  #
-  # Example
+  # examples:
   # 
   # dependencies:
   #   override:
+  #     - npm install --only=dev # this overrides the default npm install with a call that includes an environment
+  #   post:
   #     - ./patch_files.sh
-  #
   pre:
   override:
   post:
 
+#---STAGE 3: RUN TESTS ---#
+#
+# Add your test commands here
+#
+# Just like in STAGE 2, circleci will detect many types of frameworks and automatically
+# run the appropriate test script.
+#
+# For example, if nodejs is detected, circleci will automatically run "npm test"
+
 test:
-  # add your test commands here
-  # 
-  # Examples
+  # examples:
+  #
   # test:
   #   override:
   #     - php ./test-suite/run.php --unit-tests
   #     - make test 
+  pre:
   override:
+  post:
+
+#--STAGE 4: DEPLOY CODE---#
+  # Customize your deployment commands (if necessary)
+  # Example below can be left as is for most Gigster projects
 
 deployment:
-  # Customize your deployment commands (if necessary)
-  # Below values can be left as is for Gigster HQ projects
-  #prod:
-  #  branch: master
-  #  owner: liquidlabs-co
-  #  commands:
-  #    - ./deploy.sh
+  # examples:
+  #
+  # staging:
+  #   branch: master
+  #   owner: gigster-eng
+  #   commands:
+  #     - ./deploy.sh --staging=true
+  #
+  # 
+  prod:
+    branch: master
+    owner: $YOUR_GITHUB_USER_NAME
+    commands:
+      - ./deploy.sh
+  
