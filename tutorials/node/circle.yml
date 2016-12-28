@@ -1,0 +1,44 @@
+machine:
+  services:
+    - docker
+  environment:
+  # set your environment variables here
+  #
+  # Example:
+  #
+  # environment:
+  #   DB_URL_MONGO: mongodb://127.0.0.1:2017/test
+dependencies:
+  # Circle automatically detects the dependencies for many types of frameworks
+  # e.g., Ruby's Gemfile, Python's requirements.txt, and Node.js's package.json
+  # You can add pre, post, and override sections in the dependencies block to run
+  # your custom dependency commands
+  #
+  # Example
+  # 
+  # dependencies:
+  #   override:
+  #     - ./patch_files.sh
+  #
+  pre:
+  override:
+  post:
+
+test:
+  # add your test commands here
+  # 
+  # Examples
+  # test:
+  #   override:
+  #     - php ./test-suite/run.php --unit-tests
+  #     - make test 
+  override:
+
+deployment:
+  # Customize your deployment commands (if necessary)
+  # Below values can be left as is for Gigster HQ projects
+  prod:
+    branch: master
+    owner: liquidlabs-co
+    commands:
+      - ./deploy.sh
