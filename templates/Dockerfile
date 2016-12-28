@@ -1,8 +1,8 @@
 #---README---#
 # 
-# Type "docker build ." in your local repo directory to create the docker container.
+# Type "docker build . -t YOUR_REPO_NAME:latest" in your local repo directory to create the docker container.
 # This file will build successfully without modification, though it won't do anything
-# useful at this point.
+# useful at that point.
 #
 # Please customize the commands in each of the four stages below to your apps specifications
 # before checking in.
@@ -14,7 +14,7 @@
 #  FROM CONTAINER_NAME:tag
 # 
 # recommended base images
-#  nodejs - node:6.9-onbuild -- https://hub.docker.com/_/node/
+#  nodejs - node:6.9 -- https://hub.docker.com/_/node/
 #  python - python:3-onbuild -- https://hub.docker.com/_/python/ 
 #  ruby on rails -  rails:onbuild -- https://hub.docker.com/_/rails/
 #  django - python:3.4 -- https://hub.docker.com/_/django/; official repo is depcrecated 
@@ -22,7 +22,7 @@
 #  postgres - postgres:9 -- https://hub.docker.com/_/postgres/
 #  redis - redis:3.0 -- https://hub.docker.com/r/_/redis/
 
-FROM ubuntu:latest
+FROM nodejs:6.9
 
 # ---STAGE 2: SETUP THE CONTAINER---# 
 #
@@ -33,6 +33,7 @@ FROM ubuntu:latest
 # 
 # example: 
 #   RUN apt-get update && apt-get install -y mongodb
+
 RUN apt-get -y update
 
 # WORKDIR - Set your working directory
@@ -40,9 +41,10 @@ RUN apt-get -y update
 # example:
 #   WORKDIR /SOME_DIRECTORY
 
-# CP - copy files from directory docker build is run, usually your local copy of the repo
-#      CP . .  copies out the files from the current directory into the container
-CP . .
+# COPY - copy files from directory docker build is run, usually your local copy of the repo
+#      COPY . .  copies out the files from the current directory into the container
+
+COPYU . .
 
 #---STAGE 3. INSTALL OR PATCH YOUR CODE---#
 #
@@ -69,4 +71,5 @@ CP . .
 # example 3: this will execute a command that will keep your container running after
 # run it. this does nothing useful, but ensures that PID 1 exists. Docker stops when 
 # PID 1 is gone, which occurs when the CMD command terminates  
+
 CMD ["tail","-f", "/etc/hosts"]
