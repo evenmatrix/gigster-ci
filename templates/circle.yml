@@ -1,44 +1,96 @@
+#---SECTION 1: CUSTOMIZE THE TEST MACHINE---#
+#
+# Setting up your test environment has two key parts: 
+# (1) determining which circleci services to use
+# (2) setting environment variables
+#
 machine:
   services:
     - docker
   environment:
   # set your environment variables here
   #
-  # Example:
+  # examples:
   #
   # environment:
   #   DB_URL_MONGO: mongodb://127.0.0.1:2017/test
+    KUBECONFIG: $PWD/$CIRCLE_PROJECT_REPONAME/k8s/kubeconfig.yml
+    PATH: $PATH:$PWD/$CIRCLE_PROJECT_REPONAME/kubernetes/client/bin  
+
+#---SECTION 2: INSTALL DEPENDENCIES---#
+#
+# Circle automatically detects the dependencies for many types of frameworks
+# e.g., Ruby's Gemfile, Python's requirements.txt, and Node.js's package.json
+#
+# When a framework is detected, circleci will automatically run the appropriate
+# command. For example, if nodjes is detected, circleci will automatically run
+# "npm install", i.e., no need to run it 
+#
+# You can add pre, post, and override sections in the dependencies block to run
+# your custom dependency commands
+
 dependencies:
-  # Circle automatically detects the dependencies for many types of frameworks
-  # e.g., Ruby's Gemfile, Python's requirements.txt, and Node.js's package.json
-  # You can add pre, post, and override sections in the dependencies block to run
-  # your custom dependency commands
-  #
-  # Example
+  # examples:
   # 
   # dependencies:
   #   override:
+  #     - npm install --only=dev # this overrides the default npm install with a call that includes an environment
+  #   post:
   #     - ./patch_files.sh
-  #
   pre:
   override:
   post:
+    - npm install mocha@3.2.0 -g
+    - wget https://github.com/kubernetes/kubernetes/releases/download/v1.5.0-beta.2/kubernetes.tar.gz
+    - tar -xvzf kubernetes.tar.gz
+    - echo “Y” | kubernetes/cluster/get-kube-binaries.sh
+
+#---SECTION 3: RUN TESTS ---#
+#
+# Add your test commands here
+#
+# For example, if your have a nodejs project, you should add "- npm test" under override
+#
+# Test can have the usal pre, override, and post sections
+#
+# pre: in this section you should build your docker file, and if you need to run the server separately to test it then you need to run the containr
+# override: in this section you should execute the scripts inside the docker container
 
 test:
-  # add your test commands here
-  # 
-  # Examples
+  # examples:
+  #
   # test:
   #   override:
   #     - php ./test-suite/run.php --unit-tests
   #     - make test 
+  
+  pre:
+    - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM .
+    - docker run --name $CIRCLE_PROJECT_REPONAME -p 3000:3000 -d $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM 
+    - sleep 1m
   override:
+    - npm test
+  post:
+  
+#--SECTION 4: DEPLOY CODE---#
+# Customize your deployment commands (if necessary)
+# Example below can be left as is for most Gigster projects
 
 deployment:
-  # Customize your deployment commands (if necessary)
-  # Below values can be left as is for Gigster HQ projects
+  # examples:
+  #
+  # staging:
+  #   branch: master
+  #   owner: gigster-eng
+  #   commands:
+  #     - ./deploy.sh --staging=true
+  #
+  # Replace gigster-eng with your github username if you are just experimenting
+  # in your personal account
+  #
+
   prod:
     branch: master
-    owner: liquidlabs-co
+    owner: gigster-eng
     commands:
       - ./deploy.sh
