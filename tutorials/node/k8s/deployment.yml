@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: node-tutorial
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: node-tutorial
+    spec:
+      containers:
+        - name: node-tutorial
+          image: 804879515677.dkr.ecr.us-east-1.amazonaws.com/node-tutorial:33
+          args:
+            - npm
+            - run
+            - start
+          env:
+          ports:
+            - containerPort: 3000
