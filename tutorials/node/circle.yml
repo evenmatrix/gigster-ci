@@ -1,6 +1,6 @@
-#---STAGE 1: CUSTOMIZE THE TEST MACHINE---#
+#---SECTION 1: CUSTOMIZE THE TEST MACHINE---#
 #
-# Setting up you test environment has two key parts: 
+# Setting up your test environment has two key parts: 
 # (1) determining which circleci services to use
 # (2) setting environment variables
 #
@@ -14,9 +14,10 @@ machine:
   #
   # environment:
   #   DB_URL_MONGO: mongodb://127.0.0.1:2017/test
-  
-    YOUR_GITHUB_USERNAME: # TODO: set your github username
-#---STAGE 2: INSTALL DEPENDENCIES---#
+    KUBECONFIG: $PWD/$CIRCLE_PROJECT_REPONAME/k8s/kubeconfig.yml
+    PATH: $PATH:$PWD/$CIRCLE_PROJECT_REPONAME/kubernetes/client/bin  
+
+#---SECTION 2: INSTALL DEPENDENCIES---#
 #
 # Circle automatically detects the dependencies for many types of frameworks
 # e.g., Ruby's Gemfile, Python's requirements.txt, and Node.js's package.json
@@ -39,15 +40,21 @@ dependencies:
   pre:
   override:
   post:
+    - npm install mocha@3.2.0 -g
+    - wget https://github.com/kubernetes/kubernetes/releases/download/v1.5.0-beta.2/kubernetes.tar.gz
+    - tar -xvzf kubernetes.tar.gz
+    - echo “Y” | kubernetes/cluster/get-kube-binaries.sh
 
-#---STAGE 3: RUN TESTS ---#
+#---SECTION 3: RUN TESTS ---#
 #
 # Add your test commands here
 #
-# Just like in STAGE 2, circleci will detect many types of frameworks and automatically
-# run the appropriate test script.
+# For example, if your have a nodejs project, you should add "- npm test" under override
 #
-# For example, if nodejs is detected, circleci will automatically run "npm test"
+# Test can have the usal pre, override, and post sections
+#
+# pre: in this section you should build your docker file, and if you need to run the server separately to test it then you need to run the containr
+# override: in this section you should execute the scripts inside the docker container
 
 test:
   # examples:
@@ -56,13 +63,18 @@ test:
   #   override:
   #     - php ./test-suite/run.php --unit-tests
   #     - make test 
+  
   pre:
+    - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM .
+    - docker run --name $CIRCLE_PROJECT_REPONAME -p 3000:3000 -d $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM 
+    - sleep 1m
   override:
+    - npm test
   post:
-
-#--STAGE 4: DEPLOY CODE---#
-  # Customize your deployment commands (if necessary)
-  # Example below can be left as is for most Gigster projects
+  
+#--SECTION 4: DEPLOY CODE---#
+# Customize your deployment commands (if necessary)
+# Example below can be left as is for most Gigster projects
 
 deployment:
   # examples:
@@ -76,7 +88,6 @@ deployment:
   # 
   prod:
     branch: master
-    owner: $YOUR_GITHUB_USER_NAME
+    owner: frenb
     commands:
       - ./deploy.sh
-  

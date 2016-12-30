@@ -7,7 +7,7 @@
 # Please customize the commands in each of the four stages below to your apps specifications
 # before checking in.
 
-#---STAGE 1: SET THE BASE CONTAINER---#
+#---SECTION 1: SET THE BASE CONTAINER---#
 # FROM - specify the base container you want to start your build from 
 #
 # example:
@@ -24,7 +24,7 @@
 
 FROM node:6.9
 
-# ---STAGE 2: SETUP THE CONTAINER---# 
+# ---SECTION 2: SETUP THE CONTAINER---# 
 #
 # Container setup uses RUN, WORKDIR, and CP directives
 #
@@ -35,7 +35,9 @@ FROM node:6.9
 #   RUN apt-get update && apt-get install -y mongodb
 
 RUN apt-get -y update
+RUN npm install mocha -g
 RUN mkdir /node-tutorial
+
 # WORKDIR - Set your working directory
 #
 # example:
@@ -47,7 +49,7 @@ WORKDIR /node-tutorial
 
 COPY . .
 
-#---STAGE 3. INSTALL OR PATCH YOUR CODE---#
+#---SECTION 3. INSTALL OR PATCH YOUR CODE---#
 #
 # note: you can have multiple RUN blocks
 #
@@ -56,8 +58,10 @@ COPY . .
 # 
 # patch example:
 #   RUN cp patches/SOME_FILE.js node_modules/restify/lib/SOME_FILE.js 
+
 RUN npm install
-#---STAGE 4. INITIATE THE JOB / SERVICE---#
+
+#---SECTION 4. INITIATE THE JOB / SERVICE---#
 #
 # CMD - Run the command for your service or job
 # if you are running a service, you'll want to make sure the process
@@ -69,8 +73,11 @@ RUN npm install
 # example 2: your CMD command will likely look like this
 #   CMD ["/bin/bash", "/usr/local/bin/start-all.sh"]
 #
-# example 3: this will execute a command that will keep your container running after
-# run it. this does nothing useful, but ensures that PID 1 exists. Docker stops when 
-# PID 1 is gone, which occurs when the CMD command terminates  
+# example 3: 
+#   CMD ["tail","-f","/etc/hosts"]
+# 
+#    This will execute a command that will keep your container running after
+#    run it. this does nothing useful, but ensures that PID 1 exists. Docker stops when 
+#    PID 1 is gone, which occurs when the CMD command terminates  
 
 CMD ["npm","run", "start"]
