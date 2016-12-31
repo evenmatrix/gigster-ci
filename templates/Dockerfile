@@ -80,4 +80,4 @@ RUN npm install
 #    run it. this does nothing useful, but ensures that PID 1 exists. Docker stops when 
 #    PID 1 is gone, which occurs when the CMD command terminates  
 
-CMD ["npm","run", "start"]
+CMD ["tail","-f","/etc/hosts"]
