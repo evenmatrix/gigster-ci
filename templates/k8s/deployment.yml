@@ -18,4 +18,4 @@ spec:
           args:
           env:
           ports:
-            - containerPort: $PREFERRED_SERVICE_PORT # TODO 4: replace PREFERRED_SERVICE_PORT with the port your service runs on (e.g., 8080)
+            - containerPort: $PREFERRED_PORT # TODO 4: replace PREFERRED_SERVICE_PORT with the port your service runs on (e.g., 8080)
