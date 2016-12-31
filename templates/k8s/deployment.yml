@@ -1,0 +1,21 @@
+# There are four TODO's you need to complete before you can use this file
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: $YOUR_REPO_NAME # TODO 1: replace YOUR_REPO_NAME with your repo name (e.g., node-tutorial)
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: $YOUR_REPO_NAME # TODO 2: replace YOUR_REPO_NAME with your repo name (e.g., node-tutorial)
+    spec:
+      containers:
+        - name: $YOUR_REPO_NAME # TODO 3: replace YOUR_REPO_NAME with your repo name
+          image: $PATH_TO_YOUR_AWS_CONTAINER_REGISTRY/$YOUR_REPO_NAME:latest 
+          # TODO 3: replace PATH_TO_YOUR_AWS_CONTAINER_REGISTRY (e.g., 804879515677.dkr.ecr.us-east-1.amazonaws.com)  
+          # and YOUR_REPO_NAME with youre repo name (e.g. node-tutorial)
+          args:
+          env:
+          ports:
+            - containerPort: $PREFERRED_SERVICE_PORT # TODO 4: replace PREFERRED_SERVICE_PORT with the port your service runs on (e.g., 8080)
