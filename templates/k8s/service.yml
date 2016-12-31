@@ -1,0 +1,15 @@
+# there 5 TODO's you need to complete before you can use this file
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: $YOUR_REPO_NAME # TODO 1: replace YOUR_REPO_NAME with your repo name (e.g., node-tutorial)
+  name: $YOUR_REPO_NAME # TODO 2: replace YOUR_REPO_NAME with your repo name (e.g., node-tutorial)
+spec:
+  ports:
+    # The port that this service should serve on.
+    - port: $PREFERRED_EXTERNAL_PORT # TODO 3: replace PREFERRED_EXTERNAL_PORT with the port you want your service to be accessible from outside the cluster (e.g., 80)
+      targetPort: $PREFERRED_PORT # TODO 4: replace PREFERRED_PORT with the port your service will run within the container (e.g., 8080)
+  selector:
+    run: $YOUR_REPO_NAME # TODO 5: replace YOUR_REPO_NAME with your repo name (e.g., node-tutorial)
+  type: LoadBalancer
