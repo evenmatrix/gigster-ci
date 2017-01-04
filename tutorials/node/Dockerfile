@@ -1,8 +1,7 @@
 #---README---#
 # 
 # Type "docker build . -t YOUR_REPO_NAME:latest" in your local repo directory to create the docker container.
-# This file will build successfully without modification, though it won't do anything
-# useful at that point.
+# This file will build successfully without modification.
 #
 # Please customize the commands in each of the four stages below to your apps specifications
 # before checking in.

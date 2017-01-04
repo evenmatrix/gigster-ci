@@ -14,8 +14,8 @@ machine:
   #
   # environment:
   #   DB_URL_MONGO: mongodb://127.0.0.1:2017/test
-    KUBECONFIG: $PWD/$CIRCLE_PROJECT_REPONAME/k8s/kubeconfig.yml
-    PATH: $PATH:$PWD/$CIRCLE_PROJECT_REPONAME/kubernetes/client/bin  
+  #   KUBECONFIG: $PWD/$CIRCLE_PROJECT_REPONAME/k8s/kubeconfig.yml
+  #   PATH: $PATH:$PWD/$CIRCLE_PROJECT_REPONAME/kubernetes/client/bin  
 
 #---SECTION 2: INSTALL DEPENDENCIES---#
 #
@@ -37,13 +37,13 @@ dependencies:
   #     - npm install --only=dev # this overrides the default npm install with a call that includes an environment
   #   post:
   #     - ./patch_files.sh
+  #     - wget https://github.com/kubernetes/kubernetes/releases/download/v1.5.0-beta.2/kubernetes.tar.gz
+  #     - tar -xvzf kubernetes.tar.gz
+  #     - echo “Y” | kubernetes/cluster/get-kube-binaries.sh
   pre:
   override:
   post:
     - npm install mocha@3.2.0 -g
-    - wget https://github.com/kubernetes/kubernetes/releases/download/v1.5.0-beta.2/kubernetes.tar.gz
-    - tar -xvzf kubernetes.tar.gz
-    - echo “Y” | kubernetes/cluster/get-kube-binaries.sh
 
 #---SECTION 3: RUN TESTS ---#
 #
@@ -65,8 +65,8 @@ test:
   #     - make test 
   
   pre:
-    - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM .
-    - docker run --name $CIRCLE_PROJECT_REPONAME -p 3000:3000 -d $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM 
+    - docker build -t $CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM .
+    - docker run --name $CIRCLE_PROJECT_REPONAME -p 3000:3000 -d $CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM 
     - sleep 1m
   override:
     - npm test
@@ -86,8 +86,17 @@ deployment:
   #     - ./deploy.sh --staging=true
   #
   # 
-  prod:
+  # prod:
+  #  branch: master
+  #  owner: frenb
+  #  commands:
+  #    - ./deploy.sh
+
+  production:
     branch: master
     owner: frenb
     commands:
-      - ./deploy.sh
+      - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
+      - git push git@heroku.com:floating-reef-47482.git $CIRCLE_SHA1:refs/heads/master
+      - heroku run rake db:migrate --app floating-reef-47482:
+          timeout: 400

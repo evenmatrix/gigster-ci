@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
         - name: node-tutorial
-          image: 804879515677.dkr.ecr.us-east-1.amazonaws.com/node-tutorial:33
+          image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM
           args:
             - npm
             - run

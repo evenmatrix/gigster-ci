@@ -16,11 +16,12 @@
 # recommended base images
 #  nodejs - node:6.9 -- https://hub.docker.com/_/node/
 #  python - python:3-onbuild -- https://hub.docker.com/_/python/ 
-#  ruby on rails -  rails:onbuild -- https://hub.docker.com/_/rails/
+#  ruby on rails -  rails:onbuild -- https://hub.docker.com/_/rails/; official repo is deprecated
 #  django - python:3.4 -- https://hub.docker.com/_/django/; official repo is depcrecated 
 #  mysql - mysql:5 -- https://hub.docker.com/_/mysql/
 #  postgres - postgres:9 -- https://hub.docker.com/_/postgres/
 #  redis - redis:3.0 -- https://hub.docker.com/r/_/redis/
+#  mongo - mongo:3.0 -- https://hub.docker.com/_/mongo/
 
 FROM node:6.9
 
@@ -71,7 +72,7 @@ RUN npm install
 #   CMD ["COMMAND_NAME", "ARGS"] 
 #
 # example 2: your CMD command will likely look like this
-#   CMD ["/bin/bash", "/usr/local/bin/start-all.sh"]
+#   CMD ["npm","run","start"]
 #
 # example 3: 
 #   CMD ["tail","-f","/etc/hosts"]
