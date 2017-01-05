@@ -1,0 +1,17 @@
+{
+  "name": "node-tutorial",
+  "dependencies": {
+    "express": "4.14",
+    "request": "2.79.0",
+    "assert": "1.4.1",
+    "mongodb": "2.2.19"
+  },
+  "engines": {
+    "node": "6.9"
+  },
+  "scripts": 
+  {
+    "start": "node app-mongo.js",
+    "test": "mocha"
+  }
+}

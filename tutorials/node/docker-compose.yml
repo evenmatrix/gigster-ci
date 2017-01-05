@@ -1,0 +1,15 @@
+version: '2'
+services:
+  web:
+    build: .
+    ports:
+    - "3000:3000"
+    volumes:
+    - .:/code
+    - logvolume01:/var/log
+    links:
+    - mongo
+  mongo:
+    image: "mongo"
+volumes:
+  logvolume01: {}
