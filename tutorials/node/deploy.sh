@@ -87,15 +87,15 @@ configure_aws_cli
 push_ecr_image
 
 # use below for kubernetes deployments
-if [ $K8S_DEPLOY == "TRUE" ]; then
+if [ "$K8S_DEPLOY" == "TRUE" ]; then
     k8s_config
     k8s_deploy
 fi
 
-if [ $HEROKU_DEPLOY == "TRUE" ]; then
+if [ "$HEROKU_DEPLOY" == "TRUE" ]; then
     heroku_deploy
 fi
 
-if [ $ECS_DEPLOY == "TRUE" ]; then
+if [ "$ECS_DEPLOY" == "TRUE" ]; then
    ecs_deploy
 fi
