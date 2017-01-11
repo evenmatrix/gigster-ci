@@ -9,7 +9,13 @@
 # Pre-reqs:
 #   The following environment variables must be set in your circleci’s projects settings
 #     + AWS_DEFAULT_REGION
-#     + AWS_ACCOUNT_ID  
+#     + AWS_ACCOUNT_ID
+#
+# --- Below environment variables are for kubernetes deployments ---#
+#     You'll need to set K8S_DEPLOY=TRUE in CircleCI project settings
+#     for the kubernetes deployments steps to execute.
+#
+#     + K8S_DEPLOY
 #     + K8S_CERTIFICATE_AUTHORITY_DATA
 #     + K8S_CLIENT_CERTIFICATE_DATA
 #     + K8S_CLIENT_KEY_DATA
@@ -31,17 +37,33 @@ JQ="jq --raw-output --exit-status"
 # creates the kubenconfig file required to enable circleci to update your kubernetes
 # deployment. It works by taking the environment variables set up in your circle.yml
 # file (described in step 5.7 of the Gigster standard deployment process guide) and
-# and merging them with the kubeconfig.yml.template
+# and merging them with the kubeconfig.yml.template.
+# only used if K8S_DEPLOY = "TRUE"
 k8s_config(){
     envsubst < k8s/kubeconfig.yml.template > k8s/kubeconfig.yml
+    envsubst < k8s/deployment.yml > k8s/deployment-merged.yml
 }
 
 # below command updates the image used by the kubernetes deployment to point to the 
 # most recent  build of your docker container.
-# 
-# this deploy script assumes you already have a deployment on your kubernetes cluster with name $CIRCLE_PROJECT_REPONAME
+# only used if K8S_DEPLOY = "TRUE"r
 k8s_deploy(){
-   kubectl set image deployment/$CIRCLE_PROJECT_REPONAME $CIRCLE_PROJECT_REPONAME=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM
+   kubectl apply -f k8s/deployment-merged.yml 
+}
+
+heroku_deploy(){
+    [[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow
+    git push git@heroku.com:$HEROKU_APP_NAME.git $CIRCLE_SHA1:refs/heads/master
+}
+
+ecs_deploy(){
+    envsubst < docker-compose.yml.template > docker-compose.yml
+    export PATH=$PWD:$PATH
+    ecs-cli configure --region $AWS_DEFAULT_REGION --cluster $ECS_CLUSTER
+    ecs-cli compose \
+    --project-name $CIRCLE_USERNAME-$CIRCLE_PROJECT_REPONAME \
+    --file docker-compose.yml \
+    service create
 }
 
 # Configures the AWS CLI
@@ -52,14 +74,28 @@ configure_aws_cli(){
 }
 
 # pushes the ECR image to the AWS elastic container registry (ECR)
+# only used if K8S_DEPLOY = "TRUE"
 push_ecr_image(){
-    # line below genereates the ecr login, and then uses eval to execute it
+    # line below generates the ecr login command, and then uses eval to execute it
     eval $(aws ecr get-login --region $AWS_DEFAULT_REGION)
+    docker tag $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:latest
     docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM
+    docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:latest
 }
 
-# calls each method defined above in the correct sequence
 configure_aws_cli
 push_ecr_image
-k8s_config
-k8s_deploy
+
+# use below for kubernetes deployments
+if [ "$K8S_DEPLOY" == "TRUE" ]; then
+    k8s_config
+    k8s_deploy
+fi
+
+if [ "$HEROKU_DEPLOY" == "TRUE" ]; then
+    heroku_deploy
+fi
+
+if [ "$ECS_DEPLOY" == "TRUE" ]; then
+   ecs_deploy
+fi
