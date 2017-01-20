@@ -1,4 +1,5 @@
 version: '2'
+# this example is designed to be used on circleci. See how in deploy.sh
 # if you want to run locally, you'll want to change the name of this file to docker-compose.yml
 services:
   web:
