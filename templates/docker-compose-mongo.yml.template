@@ -1,0 +1,20 @@
+version: '2'
+# this file describes a more complex docker hub configuration involving
+# two services that are linked together, a web server and a database
+services:
+  web:
+    # image: references the image from which the container 
+    #        will be created. below example is intended for 
+    #        use with CircleCI, but you could reference one
+    #        local to your machine, docker hub, or your
+    #        container registry of choice       
+    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM
+    ports:
+    - "80:3000"
+    links:
+    # links allow you to define extra aliases by which a service is 
+    # reachable from another service
+    - mongo
+  mongo:
+    # below example references the latest mongo image on docker hub 
+    image: "mongo"

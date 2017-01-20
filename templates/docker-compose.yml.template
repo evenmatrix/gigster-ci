@@ -1,0 +1,14 @@
+version: '2'
+# a very basic docker-compose file with one service and
+# no dependencies. This example is useful for deploying
+# a single service to ECS
+services:
+  web:
+    # image: references the image from which the container
+    #        will be created. below example is intended for
+    #        use with CircleCI, but you could reference one
+    #        local to your machine, docker hub, or your
+    #        container registry of choice
+    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM
+    ports:
+    - "80:3000"
