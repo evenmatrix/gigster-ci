@@ -1,7 +1,8 @@
 #---README---#
 # 
 # Type "docker build . -t YOUR_REPO_NAME:latest" in your local repo directory to create the docker container.
-# This file will build successfully without modification.
+# This file will build successfully without modification, though it won't do anything
+# useful at that point.
 #
 # Please customize the commands in each of the four stages below to your apps specifications
 # before checking in.
@@ -60,7 +61,14 @@ COPY . .
 
 RUN npm install
 
-#---SECTION 4. INITIATE THE JOB / SERVICE---#
+#---SECTION 4. EXPOSE PORTS---#
+# 
+# EXPOSE informs Docker that the container listens on the specified network ports at runtime. 
+# You can expose one port number and publish it externally under another number.
+
+EXPOSE 3000:3000
+
+#---SECTION 5. INITIATE THE JOB / SERVICE---#
 #
 # CMD - Run the command for your service or job
 # if you are running a service, you'll want to make sure the process
