@@ -1,5 +1,6 @@
 version: '2'
 # if you want to run this file locally, you'll want to rename it to docker-compose.yml
+# this example is designed to be used on circleci. See how in deploy.sh
 services:
   web:
     image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CIRCLE_PROJECT_REPONAME:$CIRCLE_BUILD_NUM
