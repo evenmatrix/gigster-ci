@@ -1,4 +1,32 @@
-#---SECTION 1: CUSTOMIZE THE TEST MACHINE---#
+#---SECTION 1: CHOOSING THE BRANCHES TO BUILD---#
+#
+# CircleCI by default tests every push to any branch in the repository.
+# Testing all branches maintains quality in all branches and adds confidence
+# when the branches are to be merged with default branch.
+#
+# You may, however, blacklist branches from being built in CircleCI.
+# This example excludes gh-pages from being built in circle:
+#
+# general:
+#   branches:
+#     ignore:
+#       - gh-pages # list of branches to ignore
+#       - /release\/.*/ # or ignore regexes
+#
+# You may also whitelist branches, so only whitelisted branches will trigger
+# a build. This example limit builds in circle to master and feature-.* branches:
+#
+# general:
+#   branches:
+#     only:
+#       - master # list of branches to build
+#       - /feature-.*/ # or regexes
+general:
+  branches:
+    only:
+      - master # only build this branch
+
+#---SECTION 2: CUSTOMIZE THE TEST MACHINE---#
 #
 # Setting up your test environment has two key parts: 
 # (1) determining which circleci services to use
@@ -17,7 +45,7 @@ machine:
   #   KUBECONFIG: $PWD/$CIRCLE_PROJECT_REPONAME/k8s/kubeconfig.yml
   #   PATH: $PATH:$PWD/$CIRCLE_PROJECT_REPONAME/kubernetes/client/bin  
 
-#---SECTION 2: INSTALL DEPENDENCIES---#
+#---SECTION 3: INSTALL DEPENDENCIES---#
 #
 # Circle automatically detects the dependencies for many types of frameworks
 # e.g., Ruby's Gemfile, Python's requirements.txt, and Node.js's package.json
@@ -43,9 +71,9 @@ dependencies:
   pre:
   override:
   post:
-    - npm install mocha@3.2.0 -g
+    - npm install mocha@3.2.0 -g # library used for testing
 
-#---SECTION 3: RUN TESTS ---#
+#---SECTION 4: RUN TESTS ---#
 #
 # Add your test commands here
 #
@@ -76,7 +104,7 @@ test:
     - npm test
   post:
   
-#--SECTION 4: DEPLOY CODE---#
+#--SECTION 5: DEPLOY CODE---#
 # Customize your deployment commands (if necessary)
 # Example below can be left as is for most Gigster projects
 
@@ -84,11 +112,12 @@ deployment:
   # examples:
   #
   # staging:
-  #   branch: master
+  #   branch: master # determines branch that triggers deployment. For example, 
+  #                  # changes to branch labeled "development" would not trigger 
+  #                  # a deployment if branch: master
   #   owner: gigster-eng
   #   commands:
   #     - ./deploy.sh --staging=true
-  #
   # 
   # prod:
   #  branch: master
@@ -100,7 +129,4 @@ deployment:
     branch: master
     owner: gigster-eng
     commands:
-      - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
-      - git push git@heroku.com:floating-reef-47482.git $CIRCLE_SHA1:refs/heads/master
-      - heroku run rake db:migrate --app floating-reef-47482:
-          timeout: 400
+      - ./deploy.sh
